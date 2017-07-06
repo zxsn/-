@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<!-- 步骤：3，添加spring的配置文件 -->
+	<!-- ①将hibernate.cfg.xml整合进来 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="configLocation">
+			<value>classpath:hibernate.cfg.xml</value>
+		</property>
+	</bean>
+
+	<!-- 将SessionFactory的实例注入到Dao中 -->
+	<bean id="dao" class="com.xin.dao.StudentDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="biz" class="com.xin.biz.StudentBizImpl">
+		<constructor-arg name="dao" ref="dao" />
+	</bean>
+	<bean id="LoginAction" class="com.xin.action.LoginAction">
+		<property name="biz" ref="biz" />
+	</bean>
+	<bean id="RegisterAction" class="com.xin.action.RegisterAction">
+		<property name="biz" ref="biz" />
+	</bean>
+	<bean id="AdminAction" class="com.xin.action.AdminAction">
+		<property name="biz" ref="biz" />
+	</bean>
+	<bean id="editAction" class="com.xin.action.AdminAction">
+		<property name="biz" ref="biz" />
+	</bean>
+	<bean id="studentAction" class="com.xin.action.StudentAction">
+		<property name="biz" ref="biz" />
+	</bean>
+
+	<!-- ③配置事务管理器的bean -->
+	<bean id="txManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- ④配置事务增强处理 -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+		  <tx:method name="log*" read-only="true" />
+		  <tx:method name="regist" />
+		  <tx:method name="save" />
+		  <tx:method name="query*" />
+		  <tx:method name="find*" read-only="true" />
+		  <tx:method name="del*" />
+		  <tx:method name="pre*" />
+		  <tx:method name="edi*" />
+		  <tx:method name="transfer*" />
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- ⑤将事务增强处理织入到biz层实现类相应的方法中 -->
+	<aop:config>
+	   <aop:pointcut expression="execution(* com.xin.biz.*.*(..))" id="p"/>
+	    <aop:advisor advice-ref="txAdvice" pointcut-ref="p"/>
+	</aop:config>
+
+</beans>

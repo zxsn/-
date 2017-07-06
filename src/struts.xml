@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="default" extends="struts-default" namespace="/">
+	<!-- 登录 -->
+	  <action name="loginDealWith" class="com.xin.action.LoginAction"
+			method="login">
+			<result name="none" type="redirect">main.jsp</result>
+			<result name="success">/student/student.jsp</result>
+			<result name="error">error.jsp</result>
+		</action>
+		<!-- 注册 -->
+	  <action name="RegisterAction" class="com.xin.action.RegisterAction"
+			method="regist">
+			<result>login.jsp</result>
+			<result name="error">error.jsp</result>
+		</action>
+		<!-- 新增学生 -->
+	  <action name="newAction" class="com.xin.action.AdminAction"
+			method="queryStudent">
+			<result>/teacher/addstu.jsp</result>
+			<result name="error">/teacher/right.jsp</result>
+		</action>
+		
+		<!-- 将学生添加到点名页面 -->
+		<action name="rollcall" class="com.xin.action.RollcallAction"
+			method="addStuToArray">
+			<result>xin.jsp</result>
+			<result name="error">/teacher/right.jsp</result>
+		</action>
+		
+		<!-- 显示学生信息 -->
+	  <action name="showAction" class="com.xin.action.AdminAction"
+			method="queryStudent">
+			<result>/teacher/showstu.jsp</result>
+			<result name="error">/teacher/right.jsp</result>
+		</action>
+	  <!-- 分页高级检索所有学生 -->
+		<action name="findStudentsByConditionAction" class="AdminAction"
+			method="findStudentsByCondition">
+			<result name="queryAll" type="redirectAction">showAction</result>
+			<result>/teacher/showstu.jsp</result>
+			<result name="error">/teacher/right.jsp</result>
+		</action>
+	  <!-- 删除学生 -->
+		<action name="delAction" class="com.xin.action.AdminAction"
+			method="queryStudent">
+			
+			<result>/teacher/delstu.jsp</result>
+			<result name="error">/teacher/right.jsp</result>
+		</action>
+		
+		<action name="delActionn" class="com.xin.action.AdminAction" method="deleteStudent">
+		<result type="redirectAction">delAction</result>
+		</action>
+		<!-- 文件上传Action -->
+		<action name="fileAction" class="com.xin.action.UploadAction" method="upload">
+		    <param name="saveRealPath">/download</param>
+			<result>success.jsp</result>
+		</action>
+		
+		
+		<action name="download" class="com.xin.action.DownloadAction">
+            <result name="success" type="stream">
+                 <!-- 下载文件类型定义 -->
+                 <param name="contentType">application/octet-stream</param>
+                 <!-- 下载文件输出流定义 -->
+                 <param name="inputName">inputStream</param>
+                 　　　　　<!-- 下载文件处理方式 -->
+                  　　　　 <param name="contentDisposition">attachment;filename="${fileName}"</param>
+                 <!-- 下载文件的缓冲大小 -->
+                 <param name="bufferSize">4096</param>
+            </result>
+        </action>
+        <!--将多个附件压缩后重定向到公共的下载Action下载文件  -->
+        <action name="downloadMultiFile" class="com.xin.action.MultiFileDownloadAction" method="downloadMultiFile">
+           <result type="redirectAction">
+               <param name="actionName">download</param>
+               <param name="nameSpace">/download</param>
+               <!--附件的完整路径  -->
+               <param name="fileName">${fileName}</param>
+           </result>
+       </action>
+       
+       <!-- 预编辑指定的学生 -->
+		<action name="preEditAction" class="editAction"
+			method="preEditStudent">
+			<result>/student/edit.jsp</result>
+			<result name="error">/student/right.jsp</result>
+		</action>
+		<!-- 编辑指定的学生 -->
+		<action name="editAction" class="editAction"
+			method="editStudent">
+			<result type="redirectAction">showAction</result>
+			<result name="error">/student/right.jsp</result>
+		</action>
+		<!-- 传递姓名 -->
+		<action name="student1" class="studentAction"
+			method="transferName">
+			<result>/student/top.jsp</result>
+		</action>
+		<!-- 传递学号 -->
+		<action name="student" class="studentAction"
+			method="transferStid">
+			<result>/student/left.jsp</result>
+			<result name="error">/student/right.jsp</result>
+		</action>
+	</package>
+</struts>    
